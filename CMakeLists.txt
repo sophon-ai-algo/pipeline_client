@@ -6,6 +6,7 @@ project(face_demo_client)
 
 add_compile_options(-std=c++11 -Wno-deprecated-declarations)
 set(CMAKE_CXX_STANDARD  14)
+set(BUILD_TYPE dummy)
 
 set(APP_TOP ${CMAKE_SOURCE_DIR})
 find_package(OpenCV REQUIRED)

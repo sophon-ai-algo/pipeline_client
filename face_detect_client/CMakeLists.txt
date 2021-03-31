@@ -40,7 +40,7 @@ if (${BUILD_TYPE} STREQUAL dummy)
     set(link_libs bm_utility
             ${OpenCV_LIBS} 
             avcodec avutil avformat swscale
-            jsoncpp_lib
+            jsoncpp_lib pthread dl
             )
 endif ()
 
