@@ -72,12 +72,12 @@ namespace bm {
             return 0;
         }
 
-        uint64_t htonll(uint64_t val)
+        uint64_t bm_htonll(uint64_t val)
         {
             return (((uint64_t) htonl(val)) << 32) + htonl(val >> 32);
         }
 
-        uint64_t ntohll(uint64_t val)
+        uint64_t bm_ntohll(uint64_t val)
         {
             return (((uint64_t) ntohl(val)) << 32) + ntohl(val >> 32);
         }
@@ -148,14 +148,14 @@ namespace bm {
 
         int push_back(int64_t b)
         {
-            b = htonll(b);
+            b = bm_htonll(b);
             int8_t  *p = (int8_t*)&b;
             return push_internal(p, sizeof(b));
         }
 
         int push_back(uint64_t b)
         {
-            b = htonll(b);
+            b = bm_htonll(b);
             int8_t  *p = (int8_t*)&b;
             return push_internal(p, sizeof(b));
         }
@@ -201,7 +201,7 @@ namespace bm {
                 return -1;
             }
 
-            val = ntohll(t);
+            val = bm_ntohll(t);
             return 0;
         }
 
@@ -276,7 +276,7 @@ namespace bm {
                 return -1;
             }
 
-            val = ntohll(t);
+            val = bm_ntohll(t);
             return 0;
         }
 
@@ -310,7 +310,7 @@ namespace bm {
                 return -1;
             }
 
-            val = ntohll(t);
+            val = bm_ntohll(t);
             return 0;
         }
 
