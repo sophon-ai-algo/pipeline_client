@@ -5,7 +5,7 @@
 #include <QTimer>
 #include <mutex>
 #include "otl_utils.h"
-#include "bm_face_sdk.h"
+#include "face_info_serialize.h"
 
 namespace Ui {
 class video_pixmap_widget;
@@ -18,8 +18,8 @@ public:
     virtual ~IVideoDrawer(){}
     virtual int frame_width() = 0;
     virtual int frame_height() = 0;
-    virtual int draw_frame(const AVFrame *frame, bool bUpdate=true) = 0;
-    virtual int draw_rect(const fdrtsp::FaceRectVector& vct_rect, const std::vector<fdrtsp::FaceRecognitionInfo> &vct_label, bool bUpdate=true) = 0;
+    virtual int draw_frame(const AVFrame *frame) = 0;
+    virtual int draw_info(const bm::NetOutputDatum &info) = 0;
     virtual int clear_frame() = 0;
 };
 
@@ -33,8 +33,8 @@ public:
 
     virtual int frame_width() override;
     virtual int frame_height() override;
-    virtual int draw_frame(const AVFrame *frame, bool bUpdate=true) override;
-    virtual int draw_rect(const fdrtsp::FaceRectVector& vct_rect, const std::vector<fdrtsp::FaceRecognitionInfo> &vct_label, bool bUpdate=true) override;
+    virtual int draw_frame(const AVFrame *frame) override;
+    virtual int draw_info(const bm::NetOutputDatum &info) override;
     int clear_frame() override;
 
 protected:
@@ -44,11 +44,15 @@ protected slots:
     void onRefreshTimeout();
 private:
     unsigned char* avframe_to_rgb32(const AVFrame *frame);
-
+    void drawBox(QImage& dst);
+    void drawPose(QImage& dst);
+    void renderKeyPointsCpu(QImage& img,const std::vector<float>& keypoints, std::vector<int> keyshape,
+                            const std::vector<unsigned int>& pairs, const std::vector<float> colors,
+                            const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
+                            const float threshold, float scaleX, float scaleY);
     Ui::video_pixmap_widget *ui;
     AVFrame *m_avframe {0};
-    fdrtsp::FaceRectVector m_vct_face_rect;
-    std::vector<fdrtsp::FaceRecognitionInfo> m_vct_label;
+    bm::NetOutputDatum m_info;
     QTimer *m_refreshTimer;
     std::mutex m_syncLock;
     int m_roi_heatbeat{0};

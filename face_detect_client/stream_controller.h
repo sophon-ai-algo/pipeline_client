@@ -3,14 +3,12 @@
 
 #include "stream_decode.h"
 #include "video_widget.h"
-#include "bm_face_sdk.h"
+#include "face_info_serialize.h"
 
 struct TestFaceInfo {
     int64_t pkt_pts;
     int64_t pkt_pos;
-    fdrtsp::FaceRectVector rects;
-    fdrtsp::FaceFeatureVector features;
-    std::vector<fdrtsp::FaceRecognitionInfo> labels;
+    bm::NetOutputDatum datum;
 };
 
 class StreamController:public fdrtsp::StreamDecoderEvents

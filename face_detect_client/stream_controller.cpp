@@ -1,7 +1,7 @@
 #include "stream_controller.h"
 #include <qwidget.h>
 #include "face_info_serialize.h"
-
+#include "otl_string.h"
 
 StreamController::StreamController(video_widget *pWidget, const std::string& strUrl, int channel):m_video_widget(pWidget),
 m_rtsp_url(strUrl), m_rtsp_reader(channel)
@@ -84,10 +84,10 @@ void StreamController::on_decoded_sei_info(const uint8_t *sei_data, int sei_data
     TestFaceInfo faceinfo;
     faceinfo.pkt_pts = pkt_pts;
     faceinfo.pkt_pos = pkt_pos;
-    std::string strSEI;
-    strSEI.append((char*)sei_data, sei_data_len);
-    std::cout << strSEI << std::endl;
-    FaceInfoSerialize::get_face_features(strSEI.c_str(), faceinfo.rects, faceinfo.features, faceinfo.labels);
+
+    std::string sei_raw = String::base64_dec(sei_data, sei_data_len);
+    bm::ByteBuffer buf(sei_raw.data(), sei_raw.size());
+    faceinfo.datum.fromByteBuffer(&buf);
     std::lock_guard<std::mutex> lck(m_framelist_sync);
     m_faceList.push_back(faceinfo);
 
@@ -142,14 +142,14 @@ void StreamController::video_play_thread_proc() {
                     auto faceinfo = m_faceList.front();
                     if (AV_NOPTS_VALUE == faceinfo.pkt_pts) {
                         if (faceinfo.pkt_pos <= myFrame->pkt_pos) {
-                            render->draw_rect(faceinfo.rects, faceinfo.labels);
+                            render->draw_info(faceinfo.datum);
                             m_faceList.pop_front();
                         } else {
                             break;
                         }
                     }else {
                         if (faceinfo.pkt_pts <= myFrame->pkt_pts) {
-                            render->draw_rect(faceinfo.rects, faceinfo.labels);
+                            render->draw_info(faceinfo.datum);
                             m_faceList.pop_front();
                         } else {
                             break;

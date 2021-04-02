@@ -5,6 +5,10 @@
 #ifndef PROJECT_BM_STRING_H
 #define PROJECT_BM_STRING_H
 
+#include <iostream>
+#include <vector>
+#include <stdio.h>
+#include <stdarg.h>
 
 class String {
 public:
@@ -89,6 +93,9 @@ public:
         return str;
     }
 
+
+    static std::string base64_enc(const void *data, size_t sz);
+    static std::string base64_dec(const void *data, size_t sz);
 };
 
 

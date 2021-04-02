@@ -2,6 +2,17 @@
 #include "video_pixmap_widget.h"
 #include "ui_video_pixmap_widget.h"
 
+template<typename T>
+inline int intRound(const T a)
+{
+    return int(a+0.5f);
+}
+
+template<typename T>
+inline T fastMax(const T a, const T b)
+{
+    return (a > b ? a : b);
+}
 video_pixmap_widget::video_pixmap_widget(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::video_pixmap_widget)
@@ -30,7 +41,7 @@ int video_pixmap_widget::frame_height()
     return m_avframe == NULL ? 0:m_avframe->height;
 }
 
-int video_pixmap_widget::draw_frame(const AVFrame *frame, bool bUpdate)
+int video_pixmap_widget::draw_frame(const AVFrame *frame)
 {
     std::lock_guard<std::mutex> lck(m_syncLock);
     if (m_avframe == nullptr) {
@@ -40,25 +51,13 @@ int video_pixmap_widget::draw_frame(const AVFrame *frame, bool bUpdate)
     }
 
     av_frame_ref(m_avframe, frame);
-
-    if (bUpdate) {
-        //QEvent *e = new QEvent(BM_UPDATE_VIDEO);
-        //QCoreApplication::postEvent(this, e);
-    }
     return 0;
 }
 
-int video_pixmap_widget::draw_rect(const fdrtsp::FaceRectVector& vct_rect, const std::vector<fdrtsp::FaceRecognitionInfo> &vct_label, bool bUpdate)
+int video_pixmap_widget::draw_info(const bm::NetOutputDatum& datum)
 {
     std::lock_guard<std::mutex> lck(m_syncLock);
-	if (vct_rect.size() > 0) {
-        m_roi_heatbeat = 0;
-        m_vct_face_rect = vct_rect;
-        m_vct_label = vct_label;
-        if (bUpdate) {
-            //update();
-        }
-    }
+	m_info = datum;
 
     return 0;
 }
@@ -70,27 +69,12 @@ void video_pixmap_widget::paintEvent(QPaintEvent *event)
     if (m_avframe != nullptr) {
         std::unique_ptr<uint8_t> ptr (avframe_to_rgb32(m_avframe));
         QImage origin = QImage(ptr.get(), m_avframe->width, m_avframe->height, QImage::Format_RGB32);
-        if (m_vct_face_rect.size() > 0) {
-            QPainter painter1(&origin);
-            QPen redPen(Qt::red);
-            redPen.setWidth(5);
-            painter1.setPen(redPen);
-            for(int i = 0; i < m_vct_face_rect.size(); ++i) {
-                auto pt = m_vct_face_rect[i];
-                QRect rc(pt.x1, pt.y1, pt.x2-pt.x1, pt.y2-pt.y1);
-                painter1.drawRect(rc);
-                if (m_vct_label.size() > 0) {
-                    QString text = QString("%1-%2").arg(m_vct_label[i].label.c_str()).arg(m_vct_label[i].similar);
-                    painter1.drawText(pt.x1-1, pt.y1-4, text);
-                }
-            }
-            //m_vct_face_rect.clear();
-        }
+        if (m_info.type == bm::NetOutputDatum::Box) drawBox(origin);
+        if (m_info.type == bm::NetOutputDatum::Pose) drawPose(origin);
 
         QImage img = origin.scaled(geometry().size(), Qt::AspectRatioMode::IgnoreAspectRatio);
         painter.drawImage(0, 0, img);
     }
-
 }
 
 unsigned char* video_pixmap_widget::avframe_to_rgb32(const AVFrame *src)
@@ -136,7 +120,6 @@ void video_pixmap_widget::onRefreshTimeout()
     m_roi_heatbeat++;
     if (m_roi_heatbeat > 8) {
         m_roi_heatbeat = 0;
-        m_vct_face_rect.clear();
     }
 }
 
@@ -146,4 +129,149 @@ int video_pixmap_widget::clear_frame() {
         av_frame_free(&m_avframe);
     }
     return 0;
+}
+
+void video_pixmap_widget::drawBox(QImage &dst)
+{
+    Q_ASSERT(m_info.type == bm::NetOutputDatum::Box);
+    if (m_info.obj_rects.size() > 0) {
+        QPainter painter1(&dst);
+        QPen redPen(Qt::green);
+        redPen.setWidth(5);
+        painter1.setPen(redPen);
+        for(int i = 0; i < m_info.obj_rects.size(); ++i) {
+            auto pt = m_info.obj_rects[i];
+            QRect rc(pt.x1, pt.y1, pt.x2-pt.x1, pt.y2-pt.y1);
+            painter1.drawRect(rc);
+            //if (m_vct_label.size() > 0) {
+            //    QString text = QString("%1-%2").arg(m_vct_label[i].label.c_str()).arg(m_vct_label[i].similar);
+            //    painter1.drawText(pt.x1-1, pt.y1-4, text);
+            //}
+        }
+    }
+
+}
+
+void video_pixmap_widget::drawPose(QImage &dst) {
+#define POSE_COCO_COLORS_RENDER_GPU \
+	255.f, 0.f, 85.f, \
+	255.f, 0.f, 0.f, \
+	255.f, 85.f, 0.f, \
+	255.f, 170.f, 0.f, \
+	255.f, 255.f, 0.f, \
+	170.f, 255.f, 0.f, \
+	85.f, 255.f, 0.f, \
+	0.f, 255.f, 0.f, \
+	0.f, 255.f, 85.f, \
+	0.f, 255.f, 170.f, \
+	0.f, 255.f, 255.f, \
+	0.f, 170.f, 255.f, \
+	0.f, 85.f, 255.f, \
+	0.f, 0.f, 255.f, \
+	255.f, 0.f, 170.f, \
+	170.f, 0.f, 255.f, \
+	255.f, 0.f, 255.f, \
+	85.f, 0.f, 255.f
+    Q_ASSERT(m_info.type == bm::NetOutputDatum::Pose);
+    if (m_info.pose_keypoints.keypoints.size() == 0) return;
+    const std::vector<float> POSE_COCO_COLORS_RENDER{ POSE_COCO_COLORS_RENDER_GPU };
+    const std::vector<unsigned int> POSE_COCO_PAIRS_RENDER{1, 2, 1, 5, 2, 3, 3, 4, 5, 6, 6, 7, 1, 8, 8, 9, 9, 10, 1, 11, 11, 12, 12, 13, 1, 0, 0, 14, 14, 16, 0, 15, 15, 17};
+    // Parameters
+    const auto thicknessCircleRatio = 1.f / 75.f;
+    const auto thicknessLineRatioWRTCircle = 0.75f;
+    const auto& pairs = POSE_COCO_PAIRS_RENDER;
+    const auto renderThreshold = 0.05;
+    const auto scaleX = (float)dst.width()/m_info.pose_keypoints.width;
+    const auto scaleY = (float)dst.height()/m_info.pose_keypoints.height;
+
+    // Render keypoints
+    renderKeyPointsCpu(dst, m_info.pose_keypoints.keypoints,
+                       m_info.pose_keypoints.shape, pairs, POSE_COCO_COLORS_RENDER, thicknessCircleRatio,
+                       thicknessLineRatioWRTCircle, renderThreshold, scaleX, scaleY);
+
+}
+
+void video_pixmap_widget::renderKeyPointsCpu(QImage& img,const std::vector<float>& keypoints, std::vector<int> keyshape,
+                                             const std::vector<unsigned int>& pairs, const std::vector<float> colors,
+                                             const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
+                                             const float threshold, float scaleX, float scaleY)
+{
+    // Get frame channels
+    const auto width = img.width();
+    const auto height = img.height();
+    const auto area = width * height;
+
+    // Parameters
+    const auto lineType = 8;
+    const auto shift = 0;
+    const auto numberColors = colors.size();
+    const auto thresholdRectangle = 0.1f;
+    const auto numberKeypoints = keyshape[1];
+    QPainter painter(&img);
+    // Keypoints
+    for (auto person = 0; person < keyshape[0]; person++)
+    {
+        {
+            const auto ratioAreas = 1;
+            // Size-dependent variables
+            const auto thicknessRatio = fastMax(intRound(std::sqrt(area)*thicknessCircleRatio * ratioAreas), 1);
+            // Negative thickness in cv::circle means that a filled circle is to be drawn.
+            const auto thicknessCircle = (ratioAreas > 0.05 ? thicknessRatio : -1);
+            const auto thicknessLine = 2;// intRound(thicknessRatio * thicknessLineRatioWRTCircle);
+            const auto radius = thicknessRatio / 2;
+
+            // Draw lines
+            for (auto pair = 0u; pair < pairs.size(); pair += 2)
+            {
+                const auto index1 = (person * numberKeypoints + pairs[pair]) * keyshape[2];
+                const auto index2 = (person * numberKeypoints + pairs[pair + 1]) * keyshape[2];
+                if (keypoints[index1 + 2] > threshold && keypoints[index2 + 2] > threshold)
+                {
+                    const auto colorIndex = pairs[pair + 1] * 3; // Before: colorIndex = pair/2*3;
+                    //const cv::Scalar color{ colors[(colorIndex+2) % numberColors],
+                    //                        colors[(colorIndex + 1) % numberColors],
+                    //                        colors[(colorIndex + 0) % numberColors] };
+                    //const cv::Point keypoint1{ intRound(keypoints[index1] * scale), intRound(keypoints[index1 + 1] * scale) };
+                    //const cv::Point keypoint2{ intRound(keypoints[index2] * scale), intRound(keypoints[index2 + 1] * scale) };
+                    //cv::line(frame, keypoint1, keypoint2, color, thicknessLine, lineType, shift);
+
+                    const QPoint keypoint1{ intRound(keypoints[index1] * scaleX), intRound(keypoints[index1 + 1] * scaleY) };
+                    const QPoint keypoint2{ intRound(keypoints[index2] * scaleX), intRound(keypoints[index2 + 1] * scaleY) };
+                    QPen pen;
+                    QColor color(colors[(colorIndex+2) % numberColors],
+                                 colors[(colorIndex + 1) % numberColors],
+                                 colors[(colorIndex + 0) % numberColors]);
+                    pen.setColor(color);
+                    pen.setWidth(6);
+                    painter.setPen(pen);
+                    painter.drawLine(keypoint1, keypoint2);
+
+                }
+            }
+
+            // Draw circles
+            for (auto part = 0; part < numberKeypoints; part++)
+            {
+                const auto faceIndex = (person * numberKeypoints + part) * keyshape[2];
+                if (keypoints[faceIndex + 2] > threshold)
+                {
+                    const auto colorIndex = part * 3;
+                    //const cv::Scalar color{ colors[(colorIndex+2) % numberColors],
+                    //                        colors[(colorIndex + 1) % numberColors],
+                    //                        colors[(colorIndex + 0) % numberColors] };
+                    //const cv::Point center{ intRound(keypoints[faceIndex] * scale), intRound(keypoints[faceIndex + 1] * scale) };
+                    //cv::circle(frame, center, radius, color, thicknessCircle, lineType, shift);
+                    const QPoint center{ intRound(keypoints[faceIndex] * scaleX), intRound(keypoints[faceIndex + 1] * scaleY) };
+                    QPen pen;
+                    QColor color(colors[(colorIndex + 2) % numberColors],
+                                 colors[(colorIndex + 1) % numberColors],
+                                 colors[(colorIndex + 0) % numberColors]);
+                    pen.setColor(color);
+                    pen.setWidth(6);
+                    painter.setPen(pen);
+                    painter.drawEllipse(center, radius, radius);
+                }
+            }
+        }
+    }
 }

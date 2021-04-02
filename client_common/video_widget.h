@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <memory>
 #include "video_pixmap_widget.h"
-#include "video_opengl_widget.h"
+//#include "video_opengl_widget.h"
 
 namespace Ui {
 class video_widget;

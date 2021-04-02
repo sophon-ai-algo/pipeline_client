@@ -63,7 +63,6 @@ add_executable(face_detect_client main.cpp stream_controller.cpp
         system_settings_dlg.cpp
         ../client_common/video_widget.cpp
         ../client_common/video_pixmap_widget.cpp
-        ../client_common/video_opengl_widget.cpp
         stream_demo_qt.qrc
         open_stream_dlg.cpp
         )

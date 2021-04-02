@@ -5,6 +5,9 @@
 #include <QTableWidget>
 #include <QDockWidget>
 #include <QtCore>
+#include <QStatusBar>
+#include <QMessageBox>
+#include <QKeyEvent>
 #include <unordered_map>
 #include "ui_stream_demo_qt.h"
 #include "container_widget.h"
