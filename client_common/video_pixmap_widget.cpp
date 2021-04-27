@@ -85,6 +85,9 @@ unsigned char* video_pixmap_widget::avframe_to_rgb32(const AVFrame *src)
 
     struct SwsContext *convert_ctx = NULL;
     enum AVPixelFormat src_pix_fmt = (enum AVPixelFormat)src->format;
+    if (src_pix_fmt == AV_PIX_FMT_YUVJ420P) {
+        src_pix_fmt = AV_PIX_FMT_YUV420P;
+    }
     enum AVPixelFormat dst_pix_fmt = AV_PIX_FMT_RGB32;
 
 
