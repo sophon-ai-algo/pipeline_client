@@ -29,7 +29,7 @@ if (${BUILD_TYPE} STREQUAL pcie)
             ${JSONCPP_ROOT}
             )
     set(link_libs ${common_link_libs} jsoncpp_lib
-            glog pthread dl
+            glog
             )
     list(APPEND inc_dirs ${common_inc_dirs})
 endif ()
@@ -40,14 +40,16 @@ if (${BUILD_TYPE} STREQUAL dummy)
     set(link_libs bm_utility
             ${OpenCV_LIBS} 
             avcodec avutil avformat swscale
-            jsoncpp_lib pthread dl
+            jsoncpp_lib
             )
 endif ()
 
-if (IS_MAC) 
+if (APPLE)
     set(other_libs "-framework OpenGL")
-elseif(IS_LINUX)
-    set(other_libs gl)
+elseif(WIN32)
+    set(other_libs "ws2_32")
+else()
+    set(other_libs pthread dl gl)
 endif()
 
 message(STATUS "[face_detect_client]link_dirs=${link_dirs}")

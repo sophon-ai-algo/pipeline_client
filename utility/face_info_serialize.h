@@ -10,7 +10,12 @@
 #include <stdlib.h>
 #include <memory.h>
 #include <assert.h>
+#ifndef _WIN32
 #include <netinet/in.h>
+#else
+#include <WinSock2.h>
+#include <Windows.h>
+#endif
 #include <memory>
 
 namespace bm {
