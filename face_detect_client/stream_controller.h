@@ -26,7 +26,7 @@ public:
     StreamController(video_widget *pWidget, const std::string& strUrl, int channel);
     ~StreamController();
     int get_state();
-    int start_stream();
+    int start_stream(const std::string& strmFmt, const std::string& pixelFmt, int w, int h);
     int stop_stream();
     void set_frame_bufferd_num(int num);
 

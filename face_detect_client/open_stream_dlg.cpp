@@ -23,6 +23,12 @@ open_stream_dlg::open_stream_dlg(QWidget *parent) :
     ui->leChanNum->setText(QString::number(m_channel_num));
     ui->ckUseSameUrl->setChecked(m_isUseSameUrl);
 
+    ui->leWidth->setText(QString::number(1920));
+    ui->leHeight->setText(QString::number(1080));
+    ui->lePixelFormat->setText("yuv420p");
+    ui->leStreamFormat->setText("mjpeg");
+
+
 }
 
 open_stream_dlg::~open_stream_dlg()
@@ -35,6 +41,10 @@ void open_stream_dlg::on_buttonBox_accepted()
      m_inputUrl = ui->cbxInputUrls->currentText();
      m_channel_num = ui->leChanNum->text().toInt();
      m_isUseSameUrl = ui->ckUseSameUrl->isChecked();
+     m_pixel_format = ui->lePixelFormat->text();
+     m_stream_format = ui->leStreamFormat->text();
+     m_width = ui->leWidth->text().toInt();
+     m_height = ui->leHeight->text().toInt();
 }
 
 void open_stream_dlg::on_buttonBox_rejected()
@@ -47,4 +57,12 @@ void open_stream_dlg::GetInputUrl(QString &inputUrl, int& chan_num, bool &isUseS
     inputUrl = m_inputUrl;
     chan_num = m_channel_num;
     isUseSameUrl = m_isUseSameUrl;
+}
+
+void open_stream_dlg::GetInputParams(QString &streamFormat, QString& pixel_format, int& width, int &height)
+{
+    streamFormat = m_stream_format;
+    pixel_format = m_pixel_format;
+    width = m_width;
+    height = m_height;
 }

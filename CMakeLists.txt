@@ -4,8 +4,13 @@ project(face_demo_client)
 #set(CMAKE_C_COMPILER /home/yuan/x86-64-core-i7--glibc--stable/bin/x86_64-linux-gcc)
 #set(CMAKE_CXX_COMPILER /home/yuan/x86-64-core-i7--glibc--stable/bin/x86_64-linux-g++)
 
-set(CMAKE_CXX_STANDARD  14)
+set(CMAKE_CXX_STANDARD  17)
 set(BUILD_TYPE dummy)
+set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+#User Muse change it according envrionment
+set(OpenCV_DIR /usr/local/opt/opencv@3/share/OpenCV)
+find_package(OpenCV)
 
 set(APP_TOP ${CMAKE_SOURCE_DIR})
 

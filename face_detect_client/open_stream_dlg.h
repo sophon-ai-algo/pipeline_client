@@ -15,11 +15,17 @@ class open_stream_dlg : public QDialog
     int m_channel_num{1};
     bool m_isUseSameUrl{false};
 
+    QString m_pixel_format;
+    QString m_stream_format;
+    int m_width;
+    int m_height;
+
 public:
     explicit open_stream_dlg(QWidget *parent = nullptr);
     ~open_stream_dlg();
 
     void GetInputUrl(QString &inputUrl, int& chan_num, bool &isUseSameUrl);
+    void GetInputParams(QString &streamFormat, QString& pixel_format, int& width, int &height);
 
 private slots:
     void on_buttonBox_accepted();

@@ -113,8 +113,13 @@ void stream_demo_qt::onMenuAddWidget()
     QString inputUrl;
     int chann_num = 1;
     bool isUseSameUrl = false;
+    QString streamFormat;
+    QString pixelFormat;
+    int w, h;
 
     dlg.GetInputUrl(inputUrl, chann_num, isUseSameUrl);
+    dlg.GetInputParams(streamFormat, pixelFormat, w, h);
+
     for(int i = 0; i < chann_num; ++i){
         std::string real_url;
         video_widget *pWidget = m_pVideoContainerWidget->addChildWnd();
@@ -142,7 +147,7 @@ void stream_demo_qt::onMenuAddWidget()
         //Load all configuration
         controller->set_frame_bufferd_num(m_frameBufferedNum);
         m_mapWnd2Ctrler[pWidget] = controller;
-        controller->start_stream();
+        controller->start_stream(streamFormat.toStdString(), pixelFormat.toStdString(), w, h);
     }
 
 }

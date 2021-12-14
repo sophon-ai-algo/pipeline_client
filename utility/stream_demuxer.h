@@ -37,6 +37,10 @@ namespace fdrtsp {
         bool m_repeat;
         bool m_keep_running;
 
+        std::string m_format_name;
+        std::string m_pixel_fmt;
+        int m_width, m_height;
+
     private:
         int do_initialize();
 
@@ -52,6 +56,8 @@ namespace fdrtsp {
         int open_stream(std::string url, StreamDemuxerEvents *observer, bool repeat = true, bool isSyncOpen=false);
 
         int close_stream(bool is_waiting);
+
+        int set_param(const std::string& format_name, const std::string& pixel_format, int w, int h);
 
         //int get_codec_parameters(int stream_index, AVCodecParameters **p_codecpar);
         //int get_codec_type(int stream_index, int *p_codec_type);

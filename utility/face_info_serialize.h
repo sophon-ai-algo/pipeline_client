@@ -18,6 +18,12 @@
 #endif
 #include <memory>
 
+#ifndef BMCV_API_EXT_H
+typedef struct bmcv_rect_struct {
+    int start_x, start_y, crop_w, crop_h;
+}bmcv_rect_t;
+#endif
+
 namespace bm {
 
     class NoCopyable {
@@ -385,16 +391,42 @@ namespace bm {
         int width, height;
     };
 
+    struct SafetyhatObject {
+        float x1, y1, x2, y2;
+        float score;
+        int class_id;
+        int index;
+        float confidence;
+
+        int width() {
+            return x2-x1;
+        }
+
+        int height() {
+            return y2-y1;
+        }
+
+        void to_bmcv_rect(bmcv_rect_t *rect){
+            rect->start_y =y1;
+            rect->start_x = x1;
+            rect->crop_w = width();
+            rect->crop_h = height();
+        }
+       
+    };
+    using SafetyhatObjects = std::vector<SafetyhatObject>;
 
     struct NetOutputDatum {
         enum NetClassType {
             Box=0,
-            Pose
+            Pose,
+            FaceRecognition,
+            SaftyhatRecogniton
         };
         NetClassType type;
         NetOutputObjects obj_rects;
         PoseKeyPoints pose_keypoints;
-
+        SafetyhatObjects safetyhat_objects;
         NetOutputDatum(PoseKeyPoints& o) {
             pose_keypoints = o;
             type = Pose;
@@ -409,6 +441,10 @@ namespace bm {
             type = Box;
         }
 
+        NetOutputDatum(SafetyhatObjects& o) {
+            safetyhat_objects = o;
+            type = SaftyhatRecogniton;
+        }
         std::shared_ptr<ByteBuffer> toByteBuffer() {
             std::shared_ptr<ByteBuffer> buf = std::make_shared<ByteBuffer>();
             buf->push_back((int32_t)type);
@@ -422,6 +458,18 @@ namespace bm {
                     buf->push_back(o.score);
                     buf->push_back(o.class_id);
                 }
+            } else if (SaftyhatRecogniton == type) {
+                buf->push_back((uint32_t)safetyhat_objects.size());
+                for(auto o: safetyhat_objects) {
+                    buf->push_back(o.x1);
+                    buf->push_back(o.y1);
+                    buf->push_back(o.x2);
+                    buf->push_back(o.y2);
+                    buf->push_back(o.score);
+                    buf->push_back(o.class_id);
+                    buf->push_back(o.index);
+                    buf->push_back(o.confidence);
+                }     
             } else if(Pose == type) {
                 buf->push_back(pose_keypoints.height);
                 buf->push_back(pose_keypoints.width);
@@ -458,6 +506,21 @@ namespace bm {
                     buf->pop_front(o.score);
                     buf->pop_front(o.class_id);
                     obj_rects.push_back(o);
+                }
+            } else if(SaftyhatRecogniton == type) {
+                uint32_t size = 0;
+                buf->pop_front(size);
+                for(int i = 0; i < size; ++i) {
+                    SafetyhatObject o;
+                    buf->pop_front(o.x1);
+                    buf->pop_front(o.y1);
+                    buf->pop_front(o.x2);
+                    buf->pop_front(o.y2);
+                    buf->pop_front(o.score);
+                    buf->pop_front(o.class_id);
+                    buf->pop_front(o.index);
+                    buf->pop_front(o.confidence);
+                    safetyhat_objects.push_back(o);
                 }
             } else if(Pose == type) {
                 buf->pop_front(pose_keypoints.height);

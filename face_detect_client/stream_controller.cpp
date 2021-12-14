@@ -20,7 +20,7 @@ int StreamController::get_state()
     return 0;
 }
 
-int StreamController::start_stream()
+int StreamController::start_stream(const std::string& strmFmt, const std::string& pixelFmt, int w, int h)
 {
     if (m_play_thread) {
         m_is_play_thread_running = false;
@@ -31,6 +31,7 @@ int StreamController::start_stream()
 
     AVDictionary *opts=NULL;
     av_dict_set(&opts, "pcie_no_copyback", "0", 0);
+    m_rtsp_reader.demuxer().set_param(strmFmt, pixelFmt, w, h);
     int ret = m_rtsp_reader.open_stream(m_rtsp_url, true, opts);
     if (ret < 0){
         return ret;

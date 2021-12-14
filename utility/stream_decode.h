@@ -65,6 +65,10 @@ namespace fdrtsp {
 
         int close_stream(bool is_waiting = true);
 
+        StreamDemuxer& demuxer() {
+            return m_demuxer;
+        }
+
         //External utilities
         static AVPacket* ffmpeg_packet_alloc();
         static AVCodecContext* ffmpeg_create_decoder(enum AVCodecID id, AVDictionary **opts=nullptr);

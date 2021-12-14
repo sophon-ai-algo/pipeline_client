@@ -39,11 +39,19 @@ int StreamDemuxer::get_codec_type(int stream_index, int *p_codec_type)
     *p_codec_type = m_ifmt_ctx->streams[stream_index]->codecpar->codec_type;
     return 0;
 }*/
+    int StreamDemuxer::set_param(const std::string& format_name, const std::string& pixel_format, int w, int h)
+    {
+        m_format_name = format_name;
+        m_pixel_fmt = pixel_format;
+        m_width = w;
+        m_height = h;
+    }
 
     int StreamDemuxer::do_initialize() {
 
         std::string prefix = "rtsp://";
         AVDictionary *opts = NULL;
+        AVInputFormat *fmt = nullptr;
         if (m_inputUrl.compare(0, prefix.size(), prefix) == 0) {
             av_dict_set(&opts, "rtsp_transport", "tcp", 0);
             //av_dict_set(&opts, "stimeout", "2000000", 0);
@@ -51,13 +59,19 @@ int StreamDemuxer::get_codec_type(int stream_index, int *p_codec_type)
             //av_dict_set(&opts, "analyzeduration", "100", 0);
             //av_dict_set(&opts, "rw_timeout", "15000", 0);
             //av_dict_set(&opts, "fflags", "igndts", 0);
+        }else {
+            fmt = av_find_input_format(m_format_name.c_str());
+            if (m_format_name == "rawvideo") {
+                av_dict_set(&opts, "pixel_format", m_pixel_fmt.c_str(), 0);
+                av_dict_set_int(&opts, "width", m_width, 0);
+                av_dict_set_int(&opts, "height", m_height, 0);
+            }
         }
 
-        
 
         std::cout << "Open stream " << m_inputUrl << std::endl;
-
-        int ret = avformat_open_input(&m_ifmt_ctx, m_inputUrl.c_str(), nullptr, &opts);
+       //av_find_input_format("mjpeg");
+        int ret = avformat_open_input(&m_ifmt_ctx, m_inputUrl.c_str(), fmt, &opts);
         av_dict_free(&opts);
         if (ret < 0) {
             std::cout << "Can't open file " << m_inputUrl << std::endl;
@@ -69,10 +83,6 @@ int StreamDemuxer::get_codec_type(int stream_index, int *p_codec_type)
             std::cout << "Unable to get stream info" << std::endl;
             return ret;
         }
-
-        //for(int i = 0; i < m_ifmt_ctx->streams[0]->codecpar->extradata_size; ++i) {
-        //    printf("%x ", m_ifmt_ctx->streams[0]->codecpar->extradata[i]);
-        //}
 
         std::cout << "Init:total stream num:" << m_ifmt_ctx->nb_streams << std::endl;
         if (m_observer) {

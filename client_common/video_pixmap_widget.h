@@ -46,6 +46,7 @@ private:
     unsigned char* avframe_to_rgb32(const AVFrame *frame);
     void drawBox(QImage& dst);
     void drawPose(QImage& dst);
+    void drawSafetyHat(QImage& dst);
     void renderKeyPointsCpu(QImage& img,const std::vector<float>& keypoints, std::vector<int> keyshape,
                             const std::vector<unsigned int>& pairs, const std::vector<float> colors,
                             const float thicknessCircleRatio, const float thicknessLineRatioWRTCircle,
@@ -57,7 +58,16 @@ private:
     std::mutex m_syncLock;
     int m_roi_heatbeat{0};
 
-
+    std::string m_vct_label[4] = {
+        /*  "helmet",
+            "safety helmet",
+            "hat",
+            "no hat"*/
+        "头盔",
+        "安全帽",
+        "普通帽子",
+        "无帽子"
+    };
 };
 
 #endif // VIDEO_PIXMAP_WIDGET_H
