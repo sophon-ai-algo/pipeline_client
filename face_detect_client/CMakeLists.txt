@@ -49,7 +49,7 @@ if (APPLE)
 elseif(WIN32)
     set(other_libs "ws2_32")
 else()
-    set(other_libs pthread dl gl)
+    set(other_libs pthread dl)
 endif()
 
 message(STATUS "[face_detect_client]link_dirs=${link_dirs}")

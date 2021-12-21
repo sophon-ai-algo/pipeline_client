@@ -246,7 +246,7 @@ namespace bm {
                 return -1;
             }
 
-            val = ntohll(t);
+            val = bm_ntohll(t);
             return 0;
         }
 
