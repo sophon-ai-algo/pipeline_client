@@ -141,14 +141,20 @@ void video_pixmap_widget::drawBox(QImage& dst) {
     redPen.setWidth(5);
     painter1.setPen(redPen);
     for (int i = 0; i < m_info.obj_rects.size(); ++i) {
-      auto pt = m_info.obj_rects[i];
-      QRect rc(pt.x1, pt.y1, pt.x2 - pt.x1, pt.y2 - pt.y1);
-      painter1.drawRect(rc);
-      // if (m_vct_label.size() > 0) {
-      //    QString text =
-      //    QString("%1-%2").arg(m_vct_label[i].label.c_str()).arg(m_vct_label[i].similar);
-      //    painter1.drawText(pt.x1-1, pt.y1-4, text);
-      //}
+        bm::NetOutputObject pt;
+        if (m_info.track_rects.size() > i) {
+            pt = m_info.track_rects[i];
+        }else {
+            pt = m_info.obj_rects[i];
+        }
+
+        QRect rc(pt.x1, pt.y1, pt.x2-pt.x1, pt.y2-pt.y1);
+        painter1.drawRect(rc);
+
+        QFont font("Arail", 40);
+        painter1.setFont(font);
+        QString text = QString("%1-%2").arg(pt.class_id).arg(pt.track_id);
+        painter1.drawText(pt.x1-1, pt.y1-4, text);
     }
   }
 }

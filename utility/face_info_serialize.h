@@ -374,6 +374,18 @@ namespace bm {
         float x1, y1, x2, y2;
         float score;
         int class_id;
+        int track_id;
+
+        NetOutputObject():x1(0.0), y1(0.0), x2(0.0) ,y2(0.0), class_id(0), track_id(0) {}
+        NetOutputObject(float x1, float y1, float width, float height) {
+            this->x1 = x1;
+            this->y1 = y1;
+            this->x2 = x1 + width;
+            this->y2 = y1 + height;
+
+            this->track_id = 0;
+            this->class_id = 0;
+        }
 
         int width() {
             return x2-x1;
@@ -425,6 +437,7 @@ namespace bm {
         };
         NetClassType type;
         NetOutputObjects obj_rects;
+        NetOutputObjects track_rects;
         PoseKeyPoints pose_keypoints;
         SafetyhatObjects safetyhat_objects;
         NetOutputDatum(PoseKeyPoints& o) {

@@ -111,8 +111,8 @@ void StreamController::video_play_thread_proc() {
             if (m_last_system_ts == 0) {
                 is_play = true;
             }else {
-                auto delta = fdrtsp::RTPUtils::rtp_time_to_ntp_us(myFrame->pkt_pts - m_last_pkt_pts);
-                delta = delta > 60000 ? 60000:delta;
+                auto delta = myFrame->pkt_pts - m_last_pkt_pts;
+                delta = delta > 40000 ? 40000:delta;
                 if (m_last_system_ts + delta < cur_ts){
                     is_play = true;
                 }
