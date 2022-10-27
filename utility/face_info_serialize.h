@@ -510,6 +510,10 @@ namespace bm {
             if (Box == type) {
                 uint32_t size = 0;
                 buf->pop_front(size);
+                bool has_track = false;
+                if (sizeof(NetOutputObject) * size == buf->size()) {
+                    has_track = true;
+                }
                 for(int i = 0; i < size; ++i) {
                     NetOutputObject o;
                     buf->pop_front(o.x1);
@@ -518,6 +522,9 @@ namespace bm {
                     buf->pop_front(o.y2);
                     buf->pop_front(o.score);
                     buf->pop_front(o.class_id);
+                    if (has_track) {
+                        buf->pop_front(o.track_id);
+                    }
                     obj_rects.push_back(o);
                 }
             } else if(SaftyhatRecogniton == type) {
