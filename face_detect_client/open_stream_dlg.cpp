@@ -26,7 +26,7 @@ open_stream_dlg::open_stream_dlg(QWidget *parent) :
     ui->leWidth->setText(QString::number(1920));
     ui->leHeight->setText(QString::number(1080));
     ui->lePixelFormat->setText("yuv420p");
-    ui->leStreamFormat->setText("mjpeg");
+    ui->leStreamFormat->setText("h264");
 
 
 }

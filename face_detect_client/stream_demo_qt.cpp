@@ -16,7 +16,7 @@ stream_demo_qt::stream_demo_qt(QWidget *parent)
     statusBar()->hide();
 
     //initGUITheme();
-    m_strTitle = "BITMAIN BM1684-FaceDemo";
+    m_strTitle = "Pipeline Client Demo";
     setWindowTitle(QString::fromStdString(m_strTitle));
     loadConfig();
 
