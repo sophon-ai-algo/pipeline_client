@@ -45,6 +45,7 @@ int StreamDemuxer::get_codec_type(int stream_index, int *p_codec_type)
         m_pixel_fmt = pixel_format;
         m_width = w;
         m_height = h;
+		return 0;
     }
 
     int StreamDemuxer::do_initialize() {

@@ -1,23 +1,28 @@
 cmake_minimum_required(VERSION 3.2)
 project(face_demo_client)
 
-#set(CMAKE_C_COMPILER /home/yuan/x86-64-core-i7--glibc--stable/bin/x86_64-linux-gcc)
-#set(CMAKE_CXX_COMPILER /home/yuan/x86-64-core-i7--glibc--stable/bin/x86_64-linux-g++)
 
 set(CMAKE_CXX_STANDARD  17)
 set(BUILD_TYPE dummy)
 set(LIBRARY_OUTPUT_PATH ${CMAKE_BINARY_DIR}/lib)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 #User Muse change it according envrionment
-set(OpenCV_DIR /usr/local/opt/opencv@3/share/OpenCV)
-find_package(OpenCV)
-
-set(APP_TOP ${CMAKE_SOURCE_DIR})
-
-if (UNIX)
+if (WIN32)
+   set(DEV_ROOT E:/dev)
+   set(FFMPEG_ROOT ${DEV_ROOT}/ffmpeg)
+   set(OpenCV_DIR ${DEV_ROOT}/opencv/build)
+else (WIN32)
+   set(OpenCV_DIR /usr/local/opt/opencv@3/share/OpenCV)
    add_compile_options(-std=c++11 -Wno-deprecated-declarations)
    set(FFMPEG_ROOT /usr/local)
 endif()
+find_package(OpenCV REQUIRED)
+include_directories(${FFMPEG_ROOT}/include)
+include_directories(${OpenCV_INCLUDE_DIRS})
+link_directories(${OpenCV_LIBS} ${FFMPEG_ROOT}/lib)
+
+set(APP_TOP ${CMAKE_SOURCE_DIR})
+
 
 set(common_inc_dirs ${APP_TOP}/client_common
         ${APP_TOP}/utility
@@ -26,17 +31,7 @@ set(common_inc_dirs ${APP_TOP}/client_common
         ${FFMPEG_ROOT}/include)
 set(common_link_dirs ${FFMPEG_ROOT}/lib)
 
-if (WIN32)
-   set(DEV_ROOT c:\\dev)
-   set(FFMPEG_ROOT ${DEV_ROOT}\\ffmpeg)
-   include_directories(${FFMPEG_ROOT}\\include)
-   set(OpenCV_DIR ${DEV_ROOT}\\opencv)
-   find_package(OpenCV REQUIRED)
-   include_directories(${OpenCV_INCLUDE_DIRS})
-   link_directories(${OpenCV_LIBS} ${FFMPEG_ROOT}\\lib)
-   
-endif()
-
+set(Qt5Widgets_DIR "E:/Qt/Qt5.12.9/5.12.9/msvc2015_64/lib/cmake/Qt5Widgets")
 add_subdirectory(utility)
 add_subdirectory(third_party/jsoncpp)
 add_subdirectory(face_detect_client)

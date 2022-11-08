@@ -25,11 +25,12 @@ AI 人脸识别客户端，用来显示实时流和检测结果
 
 修改CMakeLists.txt中OpenCV_DIR为实际安装目录，并指定到cmake目录. windows下需要将编译好的库放到c:\\dev目录下。 需要读者对cmake有一定的了解。  
 
-
-> mkdir build   
-> cd build
-> cmake ..   
-> make -j4   
-> ./build/bin/face_detect_client
+```bash
+mkdir build   
+cd build
+cmake ..   
+make -j4   
+./build/bin/face_detect_client
+```
 
 
