@@ -14,7 +14,7 @@ AI 人脸识别客户端，用来显示实时流和检测结果
 |人体骨骼检测 | 支持叠加骨骼显示到实时视频
 |对象检测 | 支持检测框叠加到实时视频
 
-需要配合使用如下程序来进行全流程演示：https://github.com/sophon-ai-algo/examples/tree/main/inference
+需要配合使用如下程序来进行全流程演示：https://github.com/sophon-ai-algo/bm168x_examples/tree/3.0.0/inference
 # 编译方法
 
 > Linux平台依赖库安装:  
