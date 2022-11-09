@@ -59,7 +59,7 @@ link_directories(${link_dirs})
 
 find_package(Qt5Widgets)
 
-add_executable(face_detect_client main.cpp stream_controller.cpp
+add_executable(pipeline_client main.cpp stream_controller.cpp
         ../client_common/container_widget.cpp
         stream_demo_qt.cpp
         system_settings_dlg.cpp
