@@ -22,7 +22,7 @@ set(inc_dirs ${common_inc_dirs})
 #add_definitions(-DUSE_OPENCV=1 -DUSE_OPENGL_RENDER=1)
 add_definitions(-DUSE_OPENCV=1)
 
-message(STATUS "[face_detect_client]inc_dirs=${inc_dirs}")
+message(STATUS "[pipeline_client]inc_dirs=${inc_dirs}")
 
 if (${BUILD_TYPE} STREQUAL pcie)
     set(link_dirs ${common_link_dirs}
@@ -52,7 +52,7 @@ else()
     set(other_libs pthread dl)
 endif()
 
-message(STATUS "[face_detect_client]link_dirs=${link_dirs}")
+message(STATUS "[pipeline_client]link_dirs=${link_dirs}")
 
 include_directories(${inc_dirs})
 link_directories(${link_dirs})
@@ -68,7 +68,7 @@ add_executable(pipeline_client main.cpp stream_controller.cpp
         stream_demo_qt.qrc
         open_stream_dlg.cpp
         )
-target_link_libraries(face_detect_client Qt5::Widgets
+target_link_libraries(pipeline_client Qt5::Widgets
         ${link_libs}
         ${other_libs}
        )

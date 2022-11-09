@@ -1,4 +1,4 @@
-# face_demo_client
+# pipeline_client
 
 AI 人脸识别客户端，用来显示实时流和检测结果
 1. 支持直接拉流RTSP播放。
@@ -30,7 +30,7 @@ mkdir build
 cd build
 cmake ..   
 make -j4   
-./build/bin/face_detect_client
+./build/bin/pipeline_client
 ```
 
 
