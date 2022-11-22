@@ -17,16 +17,18 @@ AI 人脸识别客户端，用来显示实时流和检测结果
 需要配合使用如下程序来进行全流程演示：https://github.com/sophon-ai-algo/bm168x_examples/tree/3.0.0/inference
 # 编译方法
 
-> Linux平台依赖库安装:  
-> sudo apt install qtbase5-dev
-> sudo apt install libopencv-dev
-> sudo apt install ffmpeg
-> sudo apt install libavfilter-dev
+> Linux平台依赖库安装:
+```bash
+ sudo apt install qtbase5-dev
+ sudo apt install libopencv-dev
+ sudo apt install ffmpeg
+ sudo apt install libavfilter-dev
+```
 
 > MAC平台依赖库安装：请下载QT安装程序手动安装。   
 > Windows平台依赖库：ffmpeg，opencv  
 
-修改CMakeLists.txt中OpenCV_DIR为实际安装目录，并指定到cmake目录. windows下需要将编译好的库放到c:\\dev目录下。 需要读者对cmake有一定的了解。  
+修改CMakeLists.txt中OpenCV_DIR为实际安装目录，windows下必填，并指定到cmake目录. windows下需要将编译好的库放到c:\\dev目录下。 需要读者对cmake有一定的了解。  
 
 ```bash
 mkdir build   
