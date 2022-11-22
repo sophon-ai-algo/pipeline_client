@@ -19,6 +19,9 @@ AI 人脸识别客户端，用来显示实时流和检测结果
 
 > Linux平台依赖库安装:  
 > sudo apt install qtbase5-dev
+> sudo apt install libopencv-dev
+> sudo apt install ffmpeg
+> sudo apt install libavfilter-dev
 
 > MAC平台依赖库安装：请下载QT安装程序手动安装。   
 > Windows平台依赖库：ffmpeg，opencv  

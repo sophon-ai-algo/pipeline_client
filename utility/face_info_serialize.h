@@ -17,6 +17,7 @@
 #include <Windows.h>
 #endif
 #include <memory>
+#include <functional>
 
 #ifndef BMCV_API_EXT_H
 typedef struct bmcv_rect_struct {
