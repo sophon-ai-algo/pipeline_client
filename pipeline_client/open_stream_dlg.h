@@ -1,6 +1,7 @@
 #ifndef OPEN_STREAM_DLG_H
 #define OPEN_STREAM_DLG_H
 
+#include <QtWidgets/QFileDialog>
 #include <QDialog>
 
 namespace Ui {
@@ -28,6 +29,7 @@ public:
     void GetInputParams(QString &streamFormat, QString& pixel_format, int& width, int &height);
 
 private slots:
+    void choose_file();
     void on_buttonBox_accepted();
     void on_buttonBox_rejected();
 

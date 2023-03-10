@@ -135,9 +135,23 @@ void stream_demo_qt::onMenuAddWidget()
                 int port_base = std::atoi(iports[1].c_str());
                 real_url = String::format("tcp://%s:%d?listen&tcp_nodelay=1", iports[0].c_str(), port_base + i);
             }
-            else{
-                QMessageBox::information(this, windowTitle(), "Not supported!");
-                return;
+			else {
+				// New feat: 接受本地路径输入
+				std::ifstream f(inputUrl.toStdString());
+				if (f.good() && inputUrl.toStdString().find_last_of(".") != inputUrl.toStdString().npos) {
+					real_url = inputUrl.toStdString();
+					streamFormat = QString::fromStdString(real_url.substr(real_url.find_last_of(".") + 1));
+					/*
+					if (real_url.find_last_of(".") == real_url.npos || real_url.substr(real_url.find_last_of(".") + 1) != streamFormat.toStdString()) {
+					 QMessageBox::information(this, windowTitle(), "Video file format is different from the currently selected stream format!");
+					 return;
+					}
+					*/
+				}
+				else {
+					QMessageBox::information(this, windowTitle(), "Stream format not supported or wrong file path!");
+					return;
+				}
             }
 
         }else{
@@ -207,6 +221,7 @@ void stream_demo_qt::closeEvent(QCloseEvent* e)
         delete it.second;
     }
 }
+
 void stream_demo_qt::keyPressEvent(QKeyEvent *e)
 {
     return QMainWindow::keyPressEvent(e);
@@ -226,7 +241,6 @@ void stream_demo_qt::keyReleaseEvent(QKeyEvent* e)
 }
 
 void stream_demo_qt::resizeEvent(QResizeEvent *) {
-
     QRect rc = m_lblTitle->geometry();
     m_lblTitle->setGeometry(rc.x(), rc.y(), this->width()-130, rc.height());
 }

@@ -138,6 +138,7 @@ void StreamController::video_play_thread_proc() {
                 m_frameList.pop_front();
                 auto render = m_video_widget->GetVideoHwnd();
                 render->draw_frame(myFrame);
+				av_usleep(28000);
 
                 while (m_faceList.size() > 0) {
                     auto faceinfo = m_faceList.front();

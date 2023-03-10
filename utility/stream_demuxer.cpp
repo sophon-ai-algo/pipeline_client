@@ -66,6 +66,7 @@ int StreamDemuxer::get_codec_type(int stream_index, int *p_codec_type)
                 av_dict_set(&opts, "pixel_format", m_pixel_fmt.c_str(), 0);
                 av_dict_set_int(&opts, "width", m_width, 0);
                 av_dict_set_int(&opts, "height", m_height, 0);
+				//av_dict_set(&opts, "framerate", "25", 0);
             }
         }
 

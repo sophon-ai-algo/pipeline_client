@@ -15,7 +15,10 @@ open_stream_dlg::open_stream_dlg(QWidget *parent) :
             << "rtsp://admin:hk123456@192.168.1.100/test"
             << "rtsp://admin:hk123456@192.168.1.101/test"
     << "rtsp://admin:hk123456@192.168.1.102/test"
-    << "rtsp://admin:hk123456@192.168.1.103/test";
+    << "rtsp://admin:hk123456@192.168.1.103/test"
+	<< "D:\\Users\\test_01.mp4"
+	<< "D:\\Users\\test_01.h264"
+	<< "D:\\Users\\test_01.h265";
     ui->cbxInputUrls->addItems(inputUrls);
     ui->cbxInputUrls->setCurrentIndex(0);
     ui->cbxInputUrls->setEditable(true);
@@ -28,7 +31,7 @@ open_stream_dlg::open_stream_dlg(QWidget *parent) :
     ui->lePixelFormat->setText("yuv420p");
     ui->leStreamFormat->setText("h264");
 
-
+	QObject::connect(ui->chooseFileButton, &QPushButton::clicked, this, &open_stream_dlg::choose_file);
 }
 
 open_stream_dlg::~open_stream_dlg()
@@ -65,4 +68,11 @@ void open_stream_dlg::GetInputParams(QString &streamFormat, QString& pixel_forma
     pixel_format = m_pixel_format;
     width = m_width;
     height = m_height;
+}
+
+void open_stream_dlg::choose_file() {
+    QString fileName = QFileDialog::getOpenFileName(this, QStringLiteral("请选择视频文件"), "C:", QStringLiteral("视频文件(*mp4 *h264 *h265 *mkv *flv *avi *mov);;""全部类型文件(*)"));
+	if (!fileName.isEmpty()) {
+		ui->cbxInputUrls->setEditText(fileName);
+	}
 }
