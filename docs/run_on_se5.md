@@ -7,6 +7,7 @@
 * [3. 使用方法](#3-使用方法)
   * [3.1 播放本地视频](#31-播放本地视频)
   * [3.2 推流播放](#32-推流播放)
+  * [3.3 配合sophon-demo使用](#33-配合sophon-demo使用)
 * [4. FAQ](#4-faq)
 * [5. 待优化](#5-待优化)
 
@@ -69,7 +70,9 @@ ip a
 # 将${video_name}替换为推流的视频路径，${ip_address}为盒子的ip地址
 ffmpeg -re -an -c:v h264_bm -i ${video_name} -an -c:v h264_bm -enc-params "gop_preset=2" -f rtsp rtsp://${ip_address}:8554/test_0
 ```  
-打开pipeline客户端，点击右上角的绿色+号，在"input url or file path"一栏输入: rtsp://${ip_address}:8554/test(注意这里的test不用加"_0")，点击"OK"。
+打开pipeline客户端，点击右上角的绿色+号，在"input url or file path"一栏输入: rtsp://${ip_address}:8554/test(注意这里的test不用加"_0")，点击"OK"。  
+### 3.3 配合sophon-demo使用  
+以sophon-demo中的YOLOv5为例，在盒子上运行python或cpp例程对视频进行测试，测试结束后，会将预测的结果画在results/test_car_person_1080P.avi中，配合pipeline-client播放本地视频的功能可以将预测结果视频通过显示器播放。
 
 ## 4. FAQ
 1. 显示器被其他进程占用  
